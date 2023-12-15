@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <algorithm>
 
 bool inc( std::vector<int> &gaps, int max_gap, int i )
 {
