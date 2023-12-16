@@ -14,7 +14,7 @@ int dir2index( int di, int dj )
   return -1;
 }
 
-void bfs( 
+void bfs(
   std::vector<std::string> const& board, 
   std::vector<std::vector<std::bitset<4>>> &status,
   int i, int j,
@@ -149,23 +149,52 @@ int main()
   {
     status.emplace_back();
     status.back().resize( line.size(), 0 );
-    std::cout << line << "\n";
     board.push_back( std::move(line) );
-
   }
+  auto status0 = status;
 
-  // shoot right from (0,0)
-  bfs( board, status, 0, 0, 0, 1 );
+  auto count_energized = [&]( auto &status ) -> int
+  {
+    int ret = 0;
+    for( auto &i : status )
+    {
+      for( auto j : i )
+      {
+        if( j.any() ){ ++ret; }
+      }
+    }
+    return ret;
+  };
 
   int answer = 0;
-  for( auto &l : status )
+  for( int i=0; i<board.size(); ++i )
   {
-    for( auto x : l )
-    {
-      std::cout << x.count();
-      if( x.any() ){ answer++; }
-    }
-    std::cout << "\n";
+    // clear status to zero
+    status = status0;
+    // shoot right
+    bfs( board, status, i, 0, 0, 1 );
+    answer = std::max( answer, count_energized(status) );
+
+    // clear status to zero
+    status = status0;
+    // shoot left
+    bfs( board, status, i, board[0].size()-1, 0, -1 );
+    answer = std::max( answer, count_energized(status) );
   }
+  for( int j=0; j<board[0].size(); ++j )
+  {
+    // clear status to zero
+    status = status0;
+    // shoot down
+    bfs( board, status, 0, j, 1, 0 );
+    answer = std::max( answer, count_energized(status) );
+
+    // clear status to zero
+    status = status0;
+    // shoot up
+    bfs( board, status, board.size()-1, j, -1, 0 );
+    answer = std::max( answer, count_energized(status) );
+  }
+
   std::cout << answer << "\n";
 }
