@@ -7,6 +7,56 @@
 #include <algorithm>
 
 
+unsigned long long gcd( unsigned long long a ,unsigned long long b )
+{
+  if( a > b ){ std::swap(a,b); }
+
+  if( a == 0 ){ return b; }
+  return gcd( b%a, a );
+}
+unsigned long long lcm( unsigned long long a, unsigned long long b )
+{
+  return (a*b)/gcd(a,b);
+}
+
+struct cycle_info_t
+{
+  unsigned long long cycle_length;
+  unsigned long long z_index;
+};
+
+cycle_info_t combine_cycle( cycle_info_t a, cycle_info_t b )
+{
+  unsigned long long ai = a.z_index;
+  unsigned long long bi = b.z_index;
+  while( ai != bi )
+  {
+    //std::cout << "before : ";
+    //std::cout << ai << " , " << bi << "\n";
+    if( ai < bi )
+    {
+      auto diff = bi - ai;
+      auto count = diff / a.cycle_length;
+      if( diff % a.cycle_length ){ ++count; }
+      ai += a.cycle_length * count;
+      //std::cout << "add to A : " << a.cycle_length * count << "\n";
+    }
+    else
+    { 
+      auto diff = ai - bi;
+      auto count = diff / b.cycle_length;
+      if( diff % b.cycle_length ){ ++count; }
+      bi += b.cycle_length * count;
+      //std::cout << "add to B : " << a.cycle_length * count << "\n";
+    }
+    //std::cout << "after : ";
+    //std::cout << ai << " , " << bi << "\n";
+  }
+
+  unsigned long long cycle_length_lcm = lcm( a.cycle_length, b.cycle_length );
+  return { cycle_length_lcm, ai };
+}
+
 int main()
 {
   /*
@@ -67,14 +117,6 @@ std::istringstream input_file( str );
 
     return { next_name, next_id };
   };
-  struct cycle_info_t
-  {
-    int length;
-    int start;
-    int cycle_length;
-
-    long long z_index = 0;
-  };
   std::vector<cycle_info_t> cycles;
   for( int k=0; k<ends_with_A.size(); ++k )
   {
@@ -109,12 +151,24 @@ std::istringstream input_file( str );
       ++second;
     }
 
-    int length = first;
+    int third = 0;
+    while( 1 )
+    {
+      fast = next_node(fast);
+      ++third;
+
+      if( slow.name==fast.name && slow.command_id==fast.command_id )
+      {
+        break;
+      }
+    }
+
+    int length = second + third;
     int cycle_start = second;
+    int cycle_length = third;
 
-    cycles.push_back( {length, cycle_start, length-cycle_start} );
-
-    std::cout << cycles.back().length << ", " << cycles.back().start << ", " << cycles.back().cycle_length << "\n";
+    cycles.emplace_back();
+    cycles.back().cycle_length = cycle_length;
 
     int i = 0;
     while( i < length )
@@ -128,27 +182,27 @@ std::istringstream input_file( str );
       front = next_node(front);
       ++i;
     }
+
+    std::cout << "Length: " << length << "\n";
+    std::cout << "Start: " << cycle_start << "\n";
+    std::cout << "CLength: " << cycle_length << "\n";
     std::cout << "\n";
   }
-
-  while( 1 )
+  std::cout << "Cycle...\n";
+  for( auto c : cycles )
   {
-    std::sort( cycles.begin(), cycles.end(),
-      [&]( cycle_info_t &c1, cycle_info_t &c2 )
-      {
-        return c1.z_index < c2.z_index;
-      } );
-    
-    bool find = true;
-    for( int i=1; i<cycles.size(); ++i )
-    {
-      if( cycles[i-1].z_index != cycles[i].z_index ){ find=false; break; }
-    }
-    if( find )
-    {
-      std::cout << cycles[0].z_index << "\n";
-      return 0;
-    }
-    cycles[0].z_index += cycles[0].cycle_length;
+    std::cout << "zindex: " << c.z_index << ", ";
+    std::cout << "length: " << c.cycle_length << "\n";
   }
+
+  cycle_info_t c0 = cycles[0];
+  std::cout << c0.z_index << ", " << c0.cycle_length << "\n";
+  for( int i=1; i<cycles.size(); ++i )
+  {
+    std::cout << "combine with " << i << " ...\n";
+    c0 = combine_cycle( c0, cycles[i] );
+    std::cout << c0.z_index << ", " << c0.cycle_length << "\n";
+  }
+  std::cout << c0.z_index << "\n";
+  return 0;
 }
