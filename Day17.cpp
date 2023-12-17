@@ -39,6 +39,8 @@ int main()
 
   struct heat_loss_info_t
   {
+    // loss[0] : from i-direction; need to turn into j-direction
+    // loss[1] : from j-direction; need to turn into i-direction
     std::array<int,2> loss = { std::numeric_limits<int>::max(), std::numeric_limits<int>::max() };
   };
   std::vector< std::vector<heat_loss_info_t> > minimum_heat_loss;
@@ -56,9 +58,10 @@ int main()
     int from_dir;
   };
   minimum_heat_loss[0][0].loss = std::array<int,2>{ {0,0} };
-  //minimum_heat_loss[0][0].loss = std::array<int,2>{ {heat_loss[0][0], heat_loss[0][0]} };
   std::vector< bfs_info_t > bfs, pong;
+  // starting at (0,0), to i-direction
   bfs.push_back( {0,0,0} );
+  // starting at (0,0), to j-direction
   bfs.push_back( {0,0,1} );
 
   while( bfs.empty() == false )
@@ -90,7 +93,6 @@ int main()
           {
             new_loss += heat_loss[b.i+sign*j*di][b.j+sign*j*dj];
           }
-          //int new_loss = minimum_heat_loss[b.i][b.j].loss[b.from_dir] + heat_loss[newi][newj];
           if( new_loss >= minimum_heat_loss[newi][newj].loss[new_dir] )
           {
             continue;
