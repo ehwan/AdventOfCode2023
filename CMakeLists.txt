@@ -387,3 +387,35 @@ set_target_properties(
   CXX_STANDARD 17
   RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin
 )
+#project( Day21-2 CXX )
+#add_executable( Day21-2
+  #Day21-2.cpp
+#)
+#set_target_properties(
+  #Day21-2
+  #PROPERTIES
+  #CXX_STANDARD 17
+  #RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin
+#)
+
+#project( Day22 CXX )
+#add_executable( Day22
+  #Day22.cpp
+#)
+#set_target_properties(
+  #Day22
+  #PROPERTIES
+  #CXX_STANDARD 17
+  #RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin
+#)
+
+project( Day24 CXX )
+add_executable( Day24
+  Day24.cpp
+)
+set_target_properties(
+  Day24
+  PROPERTIES
+  CXX_STANDARD 17
+  RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../bin
+)
